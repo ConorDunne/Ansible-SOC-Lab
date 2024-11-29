@@ -5,11 +5,8 @@
 - name: Configure device DNS
   ansible.builtin.import_playbook: modules/configure_dns.yml
 
-  tasks:
-  - name: Upgrade the OS
-    ansible.builtin.apt:
-      update_cache: yes
-      upgrade: dist
+- name: Update system
+  ansible.builtin.import_playbook: modules/update_system.yml
 
 - name: Install Wazuh on the device
   ansible.builtin.import_playbook: modules/install_wazuh.yml
