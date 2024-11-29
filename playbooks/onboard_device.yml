@@ -1,12 +1,51 @@
 ---
 - hosts: "{{ hostname }}"
   become: true
+  tasks:
+    - name: Set the Internal DNS server
+    when: inventory_hostname in groups['Endpoints']
+    ansible.builtin.lineinfile:
+      path: /etc/systemd/resolved.conf
+      regexp: '^#DNS='
+      line: DNS=192.168.1.48
 
-- name: Configure device DNS
-  ansible.builtin.import_playbook: modules/configure_dns.yml
+  - name: Set the Hosting DNS server
+    when: inventory_hostname in groups['Servers']
+    ansible.builtin.lineinfile:
+      path: /etc/systemd/resolved.conf
+      regexp: '^#DNS='
+      line: DNS=192.168.2.88
 
-- name: Update system
-  ansible.builtin.import_playbook: modules/update_system.yml
+  - name: Restart systemd-resolved service
+    ansible.builtin.systemd_service:
+      name: systemd-resolved
+      state: restarted
+      daemon_reload: true
 
-- name: Install Wazuh on the device
-  ansible.builtin.import_playbook: modules/install_wazuh.yml
+
+  - name: Upgrade the OS
+    ansible.builtin.apt:
+      update_cache: yes
+      upgrade: dist
+
+
+  - name: Download Wazuh installer
+    ansible.builtin.get_url:
+      url: https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.9.1-1_amd64.deb
+      dest: /home/ubuntu/wazuh_agent.deb
+      mode: '0664'
+
+  - name: Install Wazuh using a Shell command
+    ansible.builtin.shell:
+      chdir: /home/ubuntu/
+      cmd: sudo WAZUH_MANAGER='wazuh.tines.lab' WAZUH_AGENT_GROUP='Debian,Endpoints' WAZUH_AGENT_NAME='var' dpkg -i ./wazuh-agent_4.9.1-1_amd64.deb
+
+  - name: Reload the Systemd daemon
+    ansible.builtin.systemd_service:
+    daemon_reload: true
+
+  - name: Enable and start the Wazuh agent
+  ansible.builtin.systemd_service:
+    name: wazuh-agent
+    enabled: true
+    state: started
