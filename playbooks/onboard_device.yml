@@ -40,10 +40,6 @@
       chdir: /home/ubuntu/
       cmd: sudo WAZUH_MANAGER='wazuh.tines.lab' WAZUH_AGENT_GROUP='Debian,Endpoints' WAZUH_AGENT_NAME='var' dpkg -i ./wazuh-agent_4.9.1-1_amd64.deb
 
-  - name: Reload the Systemd daemon
-    ansible.builtin.systemd_service:
-    daemon_reload: true
-
   - name: Enable and start the Wazuh agent
     ansible.builtin.systemd_service:
       name: wazuh-agent
