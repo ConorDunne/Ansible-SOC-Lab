@@ -1,0 +1,21 @@
+---
+- hosts: all
+  become: true
+# vars:
+#   hostname:  The name of the host
+#   username: The name of the user to create
+  tasks:
+  - name: Delete user account
+    ansible.builtin.user:
+      name: "{{ username }}"
+      state: absent
+
+  - name: Remove user group
+    ansible.builtin.group:
+      name: "{{ username }}"
+      state: absent
+
+  - name: Remove user home directory
+    ansible.builtin.file:
+      path: "/home/{{ username }}/"
+      state: absent

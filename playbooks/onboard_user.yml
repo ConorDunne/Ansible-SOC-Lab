@@ -1,0 +1,34 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+  - name: Ensure user group exists
+    ansible.builtin.group:
+      name: "{{ username }}"
+      state: present
+    
+  - name: Create admin account
+    when: inventory_hostname in groups['Endpoints']
+    ansible.builtin.user:
+      name: "{{ username }}"
+      groups: "sudo,{{ username }}"
+      create_home: true
+      state: present
+
+  - name: Create user account
+    when: inventory_hostname in groups['Servers']
+    ansible.builtin.user:
+      name: "{{ username }}"
+      group: "{{ username }}"
+      create_home: true
+      state: present
+
+  - name: Add user SSH key
+    ansible.builtin.lineinfile:
+      path: "/home/{{ username }}/.ssh/authorized_keys"
+      group: "{{ username }}"
+      owner: "{{ username }}"
+      mode: "600"
+      create: yes
+      line: "{{ ssh_key }}"

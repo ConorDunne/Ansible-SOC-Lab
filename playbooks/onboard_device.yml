@@ -1,0 +1,17 @@
+---
+- name: Configure device DNS
+  ansible.builtin.import_playbook: modules/configure_dns.yml
+  vars:
+    hostname: "{{ hostname }}"
+
+- hosts: "{{ hostname }}"
+  tasks:
+  - name: Upgrade the OS
+    ansible.builtin.apt:
+      update_cache: yes
+      upgrade: dist
+
+- name: Install Wazuh on the device
+  ansible.builtin.import_playbook: modules/install_wazuh.yml
+  vars:
+    hostname: "{{ hostname }}"
