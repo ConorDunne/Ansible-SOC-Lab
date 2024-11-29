@@ -2,7 +2,7 @@
 - hosts: "{{ hostname }}"
   become: true
   tasks:
-    - name: Set the Internal DNS server
+  - name: Set the Internal DNS server
     when: inventory_hostname in groups['Endpoints']
     ansible.builtin.lineinfile:
       path: /etc/systemd/resolved.conf
@@ -45,7 +45,7 @@
     daemon_reload: true
 
   - name: Enable and start the Wazuh agent
-  ansible.builtin.systemd_service:
-    name: wazuh-agent
-    enabled: true
-    state: started
+    ansible.builtin.systemd_service:
+      name: wazuh-agent
+      enabled: true
+      state: started
