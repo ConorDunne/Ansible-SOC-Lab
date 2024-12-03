@@ -45,6 +45,3 @@
       name: wazuh-agent
       enabled: true
       state: started
-      
-  - name: Reboot the device
-  ansible.builtin.reboot:
