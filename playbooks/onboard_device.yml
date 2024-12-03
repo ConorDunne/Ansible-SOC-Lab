@@ -38,10 +38,13 @@
   - name: Install Wazuh using a Shell command
     ansible.builtin.shell:
       chdir: /home/ubuntu/
-      cmd: sudo WAZUH_MANAGER='wazuh.tines.lab' WAZUH_AGENT_GROUP='Debian,Endpoints' WAZUH_AGENT_NAME='var' dpkg -i ./wazuh-agent_4.9.1-1_amd64.deb
+      cmd: sudo WAZUH_MANAGER='wazuh.tines.lab' WAZUH_AGENT_GROUP='Debian,Endpoints' WAZUH_AGENT_NAME='var' dpkg -i ./wazuh_agent.deb
 
   - name: Enable and start the Wazuh agent
     ansible.builtin.systemd_service:
       name: wazuh-agent
       enabled: true
       state: started
+      
+  - name: Reboot the device
+  ansible.builtin.reboot:
